@@ -16,7 +16,7 @@ func main() {
 	inc := flag.Int("inc", 0, "increment indent/nindent by this value")
 	dec := flag.Int("dec", 0, "decrement indent/nindent by this value")
 	startLine := flag.Int("start-line", 1, "ingnore lines before")
-	endLine := flag.Int("end-line", int(math.Inf(0)), "ingnore lines after")
+	endLine := flag.Int("end-line", math.MaxInt, "ingnore lines after")
 	flag.Parse()
 
 	content, err := ioutil.ReadFile(*path)
@@ -30,6 +30,7 @@ func main() {
 	for ind, line := range lines {
 		lineNum := ind + 1
 		if lineNum < *startLine || lineNum > *endLine {
+			newLines = append(newLines, line)
 			continue
 		}
 		match := indentRegex.FindStringSubmatch(line)
