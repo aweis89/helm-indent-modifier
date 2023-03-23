@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,6 +15,8 @@ func main() {
 	path := flag.String("file", "", "file to modify")
 	inc := flag.Int("inc", 0, "increment by")
 	dec := flag.Int("dec", 0, "decrement by")
+	startLine := flag.Int("start-line", 1, "ingnore lines before")
+	endLine := flag.Int("end-line", int(math.Inf(0)), "ingnore lines after")
 	flag.Parse()
 
 	content, err := ioutil.ReadFile(*path)
@@ -24,7 +27,11 @@ func main() {
 	handleErr(err)
 
 	newLines := []string{}
-	for _, line := range lines {
+	for ind, line := range lines {
+		lineNum := ind + 1
+		if lineNum < *startLine || lineNum > *endLine {
+			continue
+		}
 		match := indentRegex.FindStringSubmatch(line)
 		if len(match) > 2 {
 			indent, err := strconv.Atoi(match[2])
