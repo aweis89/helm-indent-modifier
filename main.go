@@ -13,8 +13,8 @@ import (
 
 func main() {
 	path := flag.String("file", "", "file to modify")
-	inc := flag.Int("inc", 0, "increment by")
-	dec := flag.Int("dec", 0, "decrement by")
+	inc := flag.Int("inc", 0, "increment indent/nindent by this value")
+	dec := flag.Int("dec", 0, "decrement indent/nindent by this value")
 	startLine := flag.Int("start-line", 1, "ingnore lines before")
 	endLine := flag.Int("end-line", int(math.Inf(0)), "ingnore lines after")
 	flag.Parse()
