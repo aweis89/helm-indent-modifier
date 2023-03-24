@@ -10,7 +10,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 func main() {
@@ -36,30 +35,30 @@ func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, er
 	indentRegex := regexp.MustCompile(indentRegex)
 
 	scanner := bufio.NewScanner(bytes.NewReader(content))
-	newLines := []string{}
+	newLines := [][]byte{}
 	lineNum := 1
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := scanner.Bytes()
 		if lineNum < startLine || lineNum > endLine {
 			newLines = append(newLines, line)
 			continue
 		}
-		match := indentRegex.FindStringSubmatch(line)
+		match := indentRegex.FindSubmatch(line)
 		if len(match) > 2 {
-			indent, err := strconv.Atoi(match[2])
+			indent, err := strconv.Atoi(string(match[2]))
 			handleErr(err)
 
 			indent += inc
 			indent -= dec
 
-			line = indentRegex.ReplaceAllString(line, fmt.Sprintf("$1 %d", indent))
+			line = indentRegex.ReplaceAll(line, []byte(fmt.Sprintf("$1 %d", indent)))
 		}
 		newLines = append(newLines, line)
 
 		lineNum++
 	}
 
-	return []byte(strings.Join(newLines, "\n")), nil
+	return bytes.Join(newLines, []byte("\n")), nil
 }
 
 func handleErr(err error) {
