@@ -30,11 +30,10 @@ func main() {
 	handleErr(os.WriteFile(*path, res, fs.ModeAppend))
 }
 
+const indentRegex string = `(n?indent)\s+([0-9]+)`
+
 func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, error) {
-	indentRegex, err := regexp.Compile(`(n?indent)\s+([0-9]+)`)
-	if err != nil {
-		return nil, err
-	}
+	indentRegex := regexp.MustCompile(indentRegex)
 
 	scanner := bufio.NewScanner(bytes.NewReader(content))
 	newLines := []string{}
