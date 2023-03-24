@@ -27,7 +27,7 @@ func main() {
 	res, err := processIndent(content, *inc, *dec, *startLine, *endLine)
 	handleErr(err)
 
-	ioutil.WriteFile(*path, res, fs.ModeAppend)
+	handleErr(ioutil.WriteFile(*path, res, fs.ModeAppend))
 }
 
 func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, error) {
