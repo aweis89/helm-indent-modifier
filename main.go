@@ -21,15 +21,24 @@ func main() {
 
 	content, err := ioutil.ReadFile(*path)
 	handleErr(err)
-	lines := strings.Split(string(content), "\n")
 
-	indentRegex, err := regexp.Compile(`(n?indent)\s+([0-9]+)`)
+	res, err := processIndent(content, *inc, *dec, *startLine, *endLine)
 	handleErr(err)
 
+	ioutil.WriteFile(*path, res, fs.ModeAppend)
+}
+
+func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, error) {
+	indentRegex, err := regexp.Compile(`(n?indent)\s+([0-9]+)`)
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(content), "\n")
 	newLines := []string{}
 	for ind, line := range lines {
 		lineNum := ind + 1
-		if lineNum < *startLine || lineNum > *endLine {
+		if lineNum < startLine || lineNum > endLine {
 			newLines = append(newLines, line)
 			continue
 		}
@@ -38,16 +47,15 @@ func main() {
 			indent, err := strconv.Atoi(match[2])
 			handleErr(err)
 
-			indent += *inc
-			indent -= *dec
+			indent += inc
+			indent -= dec
 
 			line = indentRegex.ReplaceAllString(line, fmt.Sprintf("$1 %d", indent))
 		}
 		newLines = append(newLines, line)
 	}
 
-	newContent := strings.Join(newLines, "\n")
-	ioutil.WriteFile(*path, []byte(newContent), fs.ModeAppend)
+	return []byte(strings.Join(newLines, "\n")), nil
 }
 
 func handleErr(err error) {
