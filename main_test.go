@@ -8,7 +8,7 @@ import (
 func Test_processIndent(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		content   []byte
+		content   string
 		inc       int
 		dec       int
 		startLine int
@@ -16,29 +16,29 @@ func Test_processIndent(t *testing.T) {
 	}
 	tests := map[string]struct {
 		args    args
-		want    []byte
+		want    string
 		wantErr bool
 	}{
 		"should inc indent": {
 			args: args{
-				content:   []byte("this:\n {{ toYaml .Foo | indent 10 }}"),
+				content:   "this:\n {{ toYaml .Foo | indent 10 }}",
 				inc:       3,
 				dec:       0,
 				startLine: 1,
 				endLine:   2,
 			},
-			want:    []byte("this:\n {{ toYaml .Foo | indent 13 }}"),
+			want:    "this:\n {{ toYaml .Foo | indent 13 }}",
 			wantErr: false,
 		},
 		"should inc nindent": {
 			args: args{
-				content:   []byte("this:\n {{ toYaml .Foo | nindent 10 }}"),
+				content:   "this:\n {{ toYaml .Foo | nindent 10 }}",
 				inc:       3,
 				dec:       0,
 				startLine: 1,
 				endLine:   2,
 			},
-			want:    []byte("this:\n {{ toYaml .Foo | nindent 13 }}"),
+			want:    "this:\n {{ toYaml .Foo | nindent 13 }}",
 			wantErr: false,
 		},
 	}
@@ -46,12 +46,12 @@ func Test_processIndent(t *testing.T) {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			got, err := processIndent(tt.args.content, tt.args.inc, tt.args.dec, tt.args.startLine, tt.args.endLine)
+			got, err := processIndent([]byte(tt.args.content), tt.args.inc, tt.args.dec, tt.args.startLine, tt.args.endLine)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("processIndent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(string(got), tt.want) {
 				t.Errorf("processIndent() = %s, want %s", got, tt.want)
 			}
 		})

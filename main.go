@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -34,10 +36,11 @@ func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, er
 		return nil, err
 	}
 
-	lines := strings.Split(string(content), "\n")
+	scanner := bufio.NewScanner(bytes.NewReader(content))
 	newLines := []string{}
-	for ind, line := range lines {
-		lineNum := ind + 1
+	lineNum := 1
+	for scanner.Scan() {
+		line := scanner.Text()
 		if lineNum < startLine || lineNum > endLine {
 			newLines = append(newLines, line)
 			continue
@@ -53,6 +56,8 @@ func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, er
 			line = indentRegex.ReplaceAllString(line, fmt.Sprintf("$1 %d", indent))
 		}
 		newLines = append(newLines, line)
+
+		lineNum++
 	}
 
 	return []byte(strings.Join(newLines, "\n")), nil
