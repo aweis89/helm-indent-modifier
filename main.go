@@ -6,8 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,13 +21,13 @@ func main() {
 	endLine := flag.Int("end-line", math.MaxInt, "ingnore lines after")
 	flag.Parse()
 
-	content, err := ioutil.ReadFile(*path)
+	content, err := os.ReadFile(*path)
 	handleErr(err)
 
 	res, err := processIndent(content, *inc, *dec, *startLine, *endLine)
 	handleErr(err)
 
-	handleErr(ioutil.WriteFile(*path, res, fs.ModeAppend))
+	handleErr(os.WriteFile(*path, res, fs.ModeAppend))
 }
 
 func processIndent(content []byte, inc, dec, startLine, endLine int) ([]byte, error) {
